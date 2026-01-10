@@ -1,0 +1,20 @@
+[project]
+name = "fuel-price-predictor"
+version = "1.0"
+description = "App to predict future NSW fuel prices by individual stations"
+authors = [
+    {name = "Chris Marwick",email = "chris_marwick@hotmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard] (>=0.128.0,<0.129.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

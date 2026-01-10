@@ -1,0 +1,5 @@
+services:
+  api:
+    build: ./py
+    ports:
+      - "5000:5000"
