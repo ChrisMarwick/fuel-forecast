@@ -16,13 +16,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@main
         with:
           role-to-assume: arn:aws:iam::623791025140:role/fuel-forecast-cicd
           aws-region: ap-southeast-2
-      - name: Get current user
+      - name: terraform apply
         run: |
-          aws sts get-caller-identity 
+          terraform init
+          terraform apply -auto-approve
+        working-directory: terraform
+
 
