@@ -1,0 +1,5 @@
+.terraform
+*.xlsx
+*.csv
+*.pyc
+.idea
