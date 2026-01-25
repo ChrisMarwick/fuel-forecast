@@ -121,6 +121,23 @@ resource "aws_apigatewayv2_integration" "api_predict_integration" {
   payload_format_version = "2.0"
 }
 
-resource "aws_s3_bucket" "s3" {
+resource "aws_s3_bucket" "s3_backend" {
   bucket = "unclechris-fuel-forecast-storage"
+}
+
+resource "aws_s3_bucket" "s3_frontend" {
+  bucket = "unclechris-fuel-forecast-frontend"
+
+}
+
+resource "aws_s3_bucket_website_configuration" "s3_frontend_website_config" {
+  bucket = aws_s3_bucket.s3_frontend.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "index.html"
+  }
 }
