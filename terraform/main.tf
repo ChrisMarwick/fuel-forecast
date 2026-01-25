@@ -43,6 +43,7 @@ resource "aws_apigatewayv2_stage" "prod_deployment" {
 resource "aws_apigatewayv2_route" "predict_api_endpoint" {
   api_id = aws_apigatewayv2_api.api_gateway.id
   route_key = "GET /predict"
+  target = "integrations/${aws_apigatewayv2_integration.api_predict_integration.id}"
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
