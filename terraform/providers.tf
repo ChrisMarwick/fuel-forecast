@@ -15,4 +15,9 @@ terraform {
 
 provider "aws" {
   region = "ap-southeast-2"
+  default_tags {
+    tags = {
+      "app" = "fuel-forecast"
+    }
+  }
 }
