@@ -72,17 +72,12 @@ resource "aws_iam_role_policy" "lambda_execution_role_policy" {
         Statement: [
           {
             "Effect": "Allow",
-            "Action": "logs:CreateLogGroup",
-            "Resource": "${local.cloudwatch_arn}:*"
-          },
-          {
-            "Effect": "Allow",
             "Action": [
               "logs:CreateLogStream",
               "logs:PutLogEvents"
             ],
             "Resource": [
-              "${local.cloudwatch_arn}:log-group:/aws/lambda/${local.func_predict_name}:*"
+              "${aws_cloudwatch_log_group.func_predict_log_group.arn}:*"
             ]
           }
         ]
@@ -95,6 +90,11 @@ data "archive_file" "func_predict_src" {
   output_path = "${path.module}/../tmp/predict_fuel_price.zip"
 }
 
+resource "aws_cloudwatch_log_group" "func_predict_log_group" {
+  name = "/aws/lambda/${local.func_predict_name}"
+  retention_in_days = 7
+}
+
 resource "aws_lambda_function" "func_predict" {
   function_name = local.func_predict_name
   filename = data.archive_file.func_predict_src.output_path
@@ -104,7 +104,12 @@ resource "aws_lambda_function" "func_predict" {
   memory_size = 128
   timeout = 5
   runtime = "python3.14"
-  handler = "handler"
+  handler = "predict_fuel_price.handler"
+
+  logging_config {
+    log_format = "JSON"
+    log_group = aws_cloudwatch_log_group.func_predict_log_group.name
+  }
 }
 
 resource "aws_apigatewayv2_integration" "api_predict_integration" {
@@ -113,6 +118,7 @@ resource "aws_apigatewayv2_integration" "api_predict_integration" {
   connection_type = "INTERNET"
   integration_method = "POST"
   integration_uri = aws_lambda_function.func_predict.invoke_arn
+  payload_format_version = "2.0"
 }
 
 resource "aws_s3_bucket" "s3" {
