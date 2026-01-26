@@ -130,6 +130,15 @@ resource "aws_s3_bucket" "s3_frontend" {
 
 }
 
+resource "aws_s3_bucket_public_access_block" "s3_frontend_acl_config" {
+  bucket = aws_s3_bucket.s3_frontend.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
 resource "aws_s3_bucket_website_configuration" "s3_frontend_website_config" {
   bucket = aws_s3_bucket.s3_frontend.id
 
@@ -140,4 +149,25 @@ resource "aws_s3_bucket_website_configuration" "s3_frontend_website_config" {
   error_document {
     key = "index.html"
   }
+}
+
+data "aws_iam_policy_document" "s3_allow_public_access_policy" {
+	statement {
+        principals {
+          type = "*"
+          identifiers = ["*"]
+        }
+        actions = [
+            "s3:GetObject"
+        ]
+        resources = [
+            "${aws_s3_bucket.s3_frontend.arn}/*"
+        ]
+	}
+}
+
+resource "aws_s3_bucket_policy" "s3_allow_public_access" {
+  bucket = aws_s3_bucket.s3_frontend.id
+
+  policy = data.aws_iam_policy_document.s3_allow_public_access_policy.json
 }
