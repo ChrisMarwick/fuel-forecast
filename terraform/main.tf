@@ -173,9 +173,10 @@ resource "aws_s3_bucket_policy" "s3_allow_public_access" {
 }
 
 resource "aws_s3_object" "s3_public_files" {
-  for_each = fileset("js/dist", "**/*")
+  for_each = fileset("${path.module}/../js/dist", "**/*")
 
   bucket = aws_s3_bucket.s3_frontend.id
   key = each.value
-  source = each.value
+  source = "${path.module}/../js/dist/${each.value}"
+  etag = filemd5("${path.module}/../js/dist/${each.value}")
 }
