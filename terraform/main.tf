@@ -180,3 +180,25 @@ resource "aws_s3_object" "s3_public_files" {
   source = "${path.module}/../js/dist/${each.value}"
   etag = filemd5("${path.module}/../js/dist/${each.value}")
 }
+
+resource "aws_dynamodb_table" "fuel_forecast_latest_prices" {
+  name = "fuel_forecast_latest_prices"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "station_and_fuel_type"
+  range_key = "date"
+
+  attribute {
+    name = "station_and_fuel_type"
+    type = "S"
+  }
+
+  attribute {
+    name = "date"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "ttl"
+    enabled = true
+  }
+}
