@@ -16,8 +16,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
 
+      - uses: actions/setup-node@v6
+      - name: update frontend
+        run: |
+          npm install
+          npm run build
+        working-directory: js
+
+      - uses: hashicorp/setup-terraform@v3
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@main
         with:
@@ -28,5 +35,3 @@ jobs:
           terraform init
           terraform apply -auto-approve
         working-directory: terraform
-
-

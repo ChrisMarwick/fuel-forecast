@@ -171,3 +171,11 @@ resource "aws_s3_bucket_policy" "s3_allow_public_access" {
 
   policy = data.aws_iam_policy_document.s3_allow_public_access_policy.json
 }
+
+resource "aws_s3_object" "s3_public_files" {
+  for_each = fileset("js/dist", "**/*")
+
+  bucket = aws_s3_bucket.s3_frontend.id
+  key = each.value
+  source = each.value
+}
