@@ -1,5 +1,5 @@
 [project]
-name = "fuel-price-predictor"
+name = "fuel-price-predictor-ml"
 version = "1.0"
 description = "App to predict future NSW fuel prices by individual stations"
 authors = [

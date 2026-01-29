@@ -20,6 +20,7 @@ set_config(transform_output='pandas')
 
 
 DATA_DIR = '.'
+# From https://data.nsw.gov.au/data/dataset/fuel-check
 DATA_FILES = [
     'price_history_checks_jan2025.csv',
     'price_history_checks_feb2025.csv',
@@ -107,6 +108,7 @@ def cleaned_fuelcheck_historic_data(csv_data, excel_data):
 if __name__ == '__main__':
 
     # df = cleaned_fuelcheck_historic_data.run()
+    # df.to_csv('aggregated.csv')
     df = pd.read_csv('aggregated.csv')
     # df = df[(df['servo_name'] == 'BP Seven Hills') & (df['fuel_code'] == 'E10')]
     df = df[df['fuel_code'] == 'E10']
@@ -141,10 +143,9 @@ if __name__ == '__main__':
     df = preprocessor.fit_transform(df)
 
 
-    df = df[['day_of_week', 'is_rising_lag_one', 'is_falling_lag_one', 'is_spike_lag_one', 'days_since_spike_lag_one', 'price']]
+    df = df[['day_of_week', 'is_rising_lag_one', 'is_falling_lag_one', 'is_spike_lag_one', 'days_since_spike_lag_one', 'yesterdays_price', 'price']]
     # df = df[['is_falling_lag_one', 'days_since_spike_lag_one', 'price']]
     # df = df[['day_of_week', 'price']]
-    # TODO- need some quantitative features that involves the current price
     train, other = train_test_split(df, train_size=0.7, test_size=0.3)
     validate, test = train_test_split(df, train_size=0.5, test_size=0.5)
     train['category'] = 'train'
@@ -175,7 +176,7 @@ if __name__ == '__main__':
 
     rfe = RFE(estimator=LinearRegression(), n_features_to_select=2)
     rfe.fit(train.drop(columns=['price']), train[['price']])
-    rfe.ranking_
+    print(rfe.ranking_)
 
     # fig, ax = plt.subplots()
     # ax.plot(df['date'], df['price'])
