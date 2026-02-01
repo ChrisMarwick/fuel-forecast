@@ -26,6 +26,9 @@ jobs:
       - name: build lambda dependencies (refresh_latest_prices)
         run: pip install -r requirements.txt --target .
         working-directory: py/functions/refresh_latest_prices
+      - name: build lambda dependencies (predict_price)
+        run: pip install -r requirements.txt --target .
+        working-directory: py/functions/predict_price
       - uses: hashicorp/setup-terraform@v3
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@main

@@ -70,13 +70,13 @@ resource "aws_iam_role_policy" "lambda_execution_role_policy" {
           "${aws_cloudwatch_log_group.log_group.arn}:*"
         ]
       },
-      {
+      length(var.secrets) > 0 ? {
         "Effect": "Allow",
         "Action": [
           "secretsmanager:GetSecretValue"
         ],
         "Resource": [for secret in aws_secretsmanager_secret.lambda_secrets: secret.arn]
-      },
+      } : null,
       {
         "Effect": "Allow",
         "Action": [
