@@ -54,7 +54,7 @@ resource "aws_scheduler_schedule" "schedule" {
   group_name = "default"
   schedule_expression = "rate(1 days)"
   schedule_expression_timezone = "Australia/Sydney"
-  start_date = "2026-02-02T02:00:00Z"
+  start_date = "2026-02-01T15:00:00Z"
 
   flexible_time_window {
     mode = "FLEXIBLE"

@@ -39,14 +39,8 @@ resource "aws_apigatewayv2_stage" "prod_deployment" {
   }
 }
 
-
-resource "aws_s3_bucket" "s3_backend" {
-  bucket = "unclechris-fuel-forecast-storage"
-}
-
 resource "aws_s3_bucket" "s3_frontend" {
   bucket = "unclechris-fuel-forecast-frontend"
-
 }
 
 resource "aws_s3_bucket_public_access_block" "s3_frontend_acl_config" {
@@ -98,6 +92,7 @@ resource "aws_s3_object" "s3_public_files" {
   key = each.value
   source = "${path.module}/../js/dist/${each.value}"
   etag = filemd5("${path.module}/../js/dist/${each.value}")
+  content_type = each.value == "index.html" ? "text/html" : null
 }
 
 resource "aws_dynamodb_table" "fuel_forecast_latest_prices" {
