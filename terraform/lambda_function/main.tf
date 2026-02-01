@@ -59,32 +59,36 @@ resource "aws_iam_role_policy" "lambda_execution_role_policy" {
 
   policy = jsonencode({
     Version: "2012-10-17",
-    Statement: [
-      {
-        "Effect": "Allow",
-        "Action": [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        "Resource": [
-          "${aws_cloudwatch_log_group.log_group.arn}:*"
-        ]
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          "secretsmanager:GetSecretValue"
-        ],
-        "Resource": [for secret in aws_secretsmanager_secret.lambda_secrets: secret.arn]
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          for permission in var.additional_lambda_permissions: permission
-        ],
-        "Resource": "*"
-      }
-    ]
+    Statement: concat(
+      [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource": [
+            "${aws_cloudwatch_log_group.log_group.arn}:*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            for permission in var.additional_lambda_permissions: permission
+          ],
+          "Resource": "*"
+        }
+      ],
+      length(var.secrets) > 0 ? [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "secretsmanager:GetSecretValue"
+          ],
+          "Resource": [for secret in aws_secretsmanager_secret.lambda_secrets: secret.arn]
+        }
+      ] : []
+    )
   })
 }
 
