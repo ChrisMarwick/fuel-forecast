@@ -37,13 +37,19 @@ resource "aws_iam_role_policy" "scheduler_role_policy" {
   })
 }
 
+moved {
+  from = module.refresh_latest_prices_func.aws_lambda_function.lambda
+  to = module.refresh_latest_prices_func.aws_lambda_function.zip_lambda[0]
+}
+
 # *** Main resources ***
 
 module "refresh_latest_prices_func" {
   source = "./lambda_function"
 
   function_name = local.refresh_func_name
-  src_path = "${path.module}/../py/functions/${local.refresh_func_name}"
+  type = "ZIP"
+  src = "${path.module}/../py/functions/${local.refresh_func_name}"
   secrets = ["nsw_gov_api_key", "nsw_gov_api_secret"]
   timeout = 300
   additional_lambda_permissions = ["dynamodb:BatchWriteItem"]

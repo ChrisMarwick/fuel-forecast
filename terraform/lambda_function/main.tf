@@ -2,7 +2,16 @@ variable "function_name" {
   type = string
 }
 
-variable "src_path" {
+variable "type" {
+  type = string
+
+  validation {
+    condition = contains(["ZIP", "ECR"], var.type)
+    error_message = "Input \"type\" must be one of \"ZIP\", \"ECR\""
+  }
+}
+
+variable "src" {
   type = string
 }
 
@@ -14,6 +23,11 @@ variable "secrets" {
 variable "timeout" {
   type = number
   default = 5
+}
+
+variable "memory_size" {
+  type = number
+  default = 128
 }
 
 variable "additional_lambda_permissions" {
@@ -33,6 +47,12 @@ variable "additional_lambda_permissions" {
 #   type = string
 #   default = "GET"
 # }
+
+locals {
+  _raw_ecr_src = var.type == "ECR" ? split(":", var.src) : null
+  ecr_repo = var.type == "ECR" ? split("/", local._raw_ecr_src[0])[1] : null
+  ecr_tag = var.type == "ECR" ? local._raw_ecr_src[1] : null
+}
 
 # *** Roles ***
 
@@ -107,15 +127,26 @@ resource "aws_cloudwatch_log_group" "log_group" {
 }
 
 data "archive_file" "lambda_src" {
+  count = var.type == "ZIP" ? 1 : 0
+
   type = "zip"
   output_path = "${path.module}/tmp/${var.function_name}.zip"
-  source_dir = var.src_path
+  source_dir = var.src
   excludes = [".venv", ".idea"]
 }
 
-resource "aws_lambda_function" "lambda" {
+data "aws_ecr_image" "lambda_src" {
+  count = var.type == "ECR" ? 1 : 0
+
+  repository_name = local.ecr_repo
+  image_tag = local.ecr_tag
+}
+
+resource "aws_lambda_function" "zip_lambda" {
+  count = var.type == "ZIP" ? 1 : 0
+
   function_name = var.function_name
-  filename = data.archive_file.lambda_src.output_path
+  filename = data.archive_file.lambda_src[0].output_path
 
   role = aws_iam_role.lambda_execution_role.arn
   architectures = ["arm64"]
@@ -123,7 +154,26 @@ resource "aws_lambda_function" "lambda" {
   timeout = var.timeout
   runtime = "python3.14"
   handler = "${var.function_name}.handler"
-  source_code_hash = data.archive_file.lambda_src.output_base64sha256
+  source_code_hash = data.archive_file.lambda_src[0].output_base64sha256
+
+  logging_config {
+    log_format = "JSON"
+    log_group = aws_cloudwatch_log_group.log_group.name
+  }
+}
+
+resource "aws_lambda_function" "ecr_lambda" {
+  count = var.type == "ECR" ? 1 : 0
+
+  function_name = var.function_name
+  package_type = "Image"
+  image_uri = data.aws_ecr_image.lambda_src[0].image_uri
+
+  role = aws_iam_role.lambda_execution_role.arn
+  architectures = ["arm64"]
+  memory_size = var.memory_size
+  timeout = var.timeout
+  source_code_hash = data.aws_ecr_image.lambda_src[0].id
 
   logging_config {
     log_format = "JSON"
@@ -147,5 +197,5 @@ resource "aws_lambda_function" "lambda" {
 # }
 
 output "arn" {
-  value = aws_lambda_function.lambda.arn
+  value = var.type == "ZIP" ? aws_lambda_function.zip_lambda[0].arn : aws_lambda_function.ecr_lambda[0].arn
 }

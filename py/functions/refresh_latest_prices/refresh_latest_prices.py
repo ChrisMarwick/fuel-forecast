@@ -6,6 +6,7 @@ import datetime
 import json
 import requests
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 
 BASE_URL = 'https://api.onegov.nsw.gov.au'
@@ -71,7 +72,8 @@ def handler(event, context):
 
   ddb = boto3.resource('dynamodb', region_name='ap-southeast-2')
   ddb_table = ddb.Table(DDB_TABLE)
-  today = datetime.datetime.combine(datetime.date.today(), datetime.time())
+  _today = datetime.datetime.now(ZoneInfo('Australia/Sydney')).date()
+  today = datetime.datetime.combine(_today, datetime.time())
   today_formatted = today.strftime('%d/%m/%Y')
   ttl = round((today + datetime.timedelta(days=4)).timestamp())
   num_processed = 0
