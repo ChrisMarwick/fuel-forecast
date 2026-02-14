@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@main
         with:
@@ -31,7 +32,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: py/functions/predict_price
+          platforms: linux/arm64
+          context: "./py/functions/predict_price"
           push: true
           tags: 623791025140.dkr.ecr.ap-southeast-2.amazonaws.com/fuel-price:latest
-# TODO- probably have to re-trigger deployment of lambda
+      - name: Re-deploy lambda with new version of image
+        run: aws lambda update-function-code --function-name predict_price --image-uri 623791025140.dkr.ecr.ap-southeast-2.amazonaws.com/fuel-price:latest

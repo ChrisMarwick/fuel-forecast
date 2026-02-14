@@ -5,5 +5,6 @@ COPY requirements.txt ${LAMBDA_TASK_ROOT}
 RUN pip install -r requirements.txt
 
 COPY predict_price.py ${LAMBDA_TASK_ROOT}
+COPY model.pkl ${LAMBDA_TASK_ROOT}
 
 CMD [ "predict_price.handler" ]
