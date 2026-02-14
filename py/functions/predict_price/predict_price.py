@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 
 def load_model():
-    with open('/model.pkl', 'rb') as f:
+    with open('./model.pkl', 'rb') as f:
         return pickle.load(f)
 
 def get():

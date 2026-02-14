@@ -33,6 +33,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/arm64
+          provenance: false
           context: "./py/functions/predict_price"
           push: true
           tags: 623791025140.dkr.ecr.ap-southeast-2.amazonaws.com/fuel-price:latest

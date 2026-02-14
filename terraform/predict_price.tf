@@ -2,11 +2,27 @@ locals {
   predict_func_name = "predict_price"
 }
 
-resource "aws_ecr_repository" "fuel_price" {
+resource "aws_ecr_repository" "container_repo" {
   name = "fuel-price"
 }
 
-# resource "aws_ecr"
+data "aws_ecr_lifecycle_policy_document" "lifecycle_policy_doc" {
+  rule {
+    priority = 1
+    description = "Only keep the latest image"
+    selection {
+      tag_status = "any"
+      count_type = "imageCountMoreThan"
+      count_number = 1
+    }
+  }
+}
+
+resource "aws_ecr_lifecycle_policy" "container_repo_lifecycle_policy" {
+  repository = aws_ecr_repository.container_repo.name
+
+  policy = data.aws_ecr_lifecycle_policy_document.lifecycle_policy_doc.json
+}
 
 resource "aws_s3_bucket" "s3_backend" {
   bucket = "unclechris-fuel-forecast-storage"
