@@ -12,11 +12,15 @@ import pandas as pd
 # docker push 623791025140.dkr.ecr.ap-southeast-2.amazonaws.com/fuel-price:latest
 
 logger = logging.getLogger()
+_model = None
 
 
 def load_model():
-    with open('./model.pkl', 'rb') as f:
-        return pickle.load(f)
+    global _model
+    if not _model:
+        with open('./model.pkl', 'rb') as f:
+            _model = pickle.load(f)
+    return _model
 
 def get():
     ddb_client = boto3.client('dynamodb')
