@@ -34,7 +34,11 @@ def get():
     )
 
 def handler(event, context):
+    print('Starting')
+    print(os.getcwd())
+    print(os.listdir('.'))
     model = load_model()
+    print('Finished loading model')
     today = datetime.date.today()
     today.weekday()
     df = pd.DataFrame([{
