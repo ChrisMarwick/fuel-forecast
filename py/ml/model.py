@@ -143,7 +143,8 @@ if __name__ == '__main__':
     df = preprocessor.fit_transform(df)
 
 
-    df = df[['day_of_week', 'is_rising_lag_one', 'is_falling_lag_one', 'is_spike_lag_one', 'days_since_spike_lag_one', 'yesterdays_price', 'price']]
+    # df = df[['day_of_week', 'is_rising_lag_one', 'is_falling_lag_one', 'is_spike_lag_one', 'days_since_spike_lag_one', 'yesterdays_price', 'price']]
+    df = df[['day_of_week', 'is_rising_lag_one', 'is_falling_lag_one', 'yesterdays_price', 'price']]
     # df = df[['is_falling_lag_one', 'days_since_spike_lag_one', 'price']]
     # df = df[['day_of_week', 'price']]
     train, other = train_test_split(df, train_size=0.7, test_size=0.3)
