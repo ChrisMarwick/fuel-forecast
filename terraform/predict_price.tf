@@ -35,7 +35,7 @@ module "predict_price_func" {
   type = "ECR"
   src = "623791025140.dkr.ecr.ap-southeast-2.amazonaws.com/fuel-price:latest"
   secrets = []
-  timeout = 15
-  memory_size = 256
+  timeout = 30
+  memory_size = 1024
   additional_lambda_permissions = ["dynamodb:GetItem", "s3:GetObject"]
 }
