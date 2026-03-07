@@ -37,5 +37,5 @@ module "predict_price_func" {
   secrets = []
   timeout = 30
   memory_size = 300
-  additional_lambda_permissions = ["dynamodb:GetItem", "s3:GetObject"]
+  additional_lambda_permissions = ["dynamodb:GetItem", "dynamodb:Query", "s3:GetObject"]
 }
